@@ -20,5 +20,23 @@
       "Sun Hat"
     ],
     "description": "Keep your garden bright during the hot months."
+  },
+  {
+    "id": "box-1780418121890",
+    "name": "Winter Box",
+    "season": "Winter",
+    "contents": [
+      "Snow"
+    ],
+    "description": "Cold"
+  },
+  {
+    "id": "box-1780418124178",
+    "name": "Autumn Box",
+    "season": "Autumn",
+    "contents": [
+      "Leaves"
+    ],
+    "description": "Crisp"
   }
 ]

@@ -107,6 +107,85 @@ app.get('/api/boxes/:id', (req, res) => {
   res.json(box);
 });
 
+// POST /api/boxes
+app.post('/api/boxes', adminMiddleware, (req, res) => {
+  const { name, season, contents, description, price } = req.body;
+  if (!name || !season || !contents || !description) {
+    return res.status(400).json({ error: 'Missing required fields' });
+  }
+
+  const boxes = readData('boxes.json');
+  const newBox = {
+    id: `box-${Date.now()}`,
+    name,
+    season,
+    contents: Array.isArray(contents) ? contents : [contents],
+    description,
+    price
+  };
+
+  boxes.push(newBox);
+  writeData('boxes.json', boxes);
+
+  const auditLogs = readData('audit.json');
+  auditLogs.push({ action: 'create_box', boxId: newBox.id, timestamp: new Date().toISOString(), user: 'admin' });
+  writeData('audit.json', auditLogs);
+
+  res.status(201).json(newBox);
+});
+
+// PUT /api/boxes/:id
+app.put('/api/boxes/:id', adminMiddleware, (req, res) => {
+  const { id } = req.params;
+  const { name, season, contents, description, price } = req.body;
+
+  const boxes = readData('boxes.json');
+  const boxIndex = boxes.findIndex(b => b.id === id);
+
+  if (boxIndex === -1) {
+    return res.status(404).json({ error: 'Box not found' });
+  }
+
+  const updatedBox = {
+    ...boxes[boxIndex],
+    name: name || boxes[boxIndex].name,
+    season: season || boxes[boxIndex].season,
+    contents: contents ? (Array.isArray(contents) ? contents : [contents]) : boxes[boxIndex].contents,
+    description: description || boxes[boxIndex].description,
+    price: price || boxes[boxIndex].price
+  };
+
+  boxes[boxIndex] = updatedBox;
+  writeData('boxes.json', boxes);
+
+  const auditLogs = readData('audit.json');
+  auditLogs.push({ action: 'update_box', boxId: id, timestamp: new Date().toISOString(), user: 'admin' });
+  writeData('audit.json', auditLogs);
+
+  res.json(updatedBox);
+});
+
+// DELETE /api/boxes/:id
+app.delete('/api/boxes/:id', adminMiddleware, (req, res) => {
+  const { id } = req.params;
+  let boxes = readData('boxes.json');
+  const initialLength = boxes.length;
+
+  boxes = boxes.filter(b => b.id !== id);
+
+  if (boxes.length === initialLength) {
+    return res.status(404).json({ error: 'Box not found' });
+  }
+
+  writeData('boxes.json', boxes);
+
+  const auditLogs = readData('audit.json');
+  auditLogs.push({ action: 'delete_box', boxId: id, timestamp: new Date().toISOString(), user: 'admin' });
+  writeData('audit.json', auditLogs);
+
+  res.json({ message: 'Box deleted successfully' });
+});
+
 // GET /api/guides
 app.get('/api/guides', (req, res) => {
   const { plantName } = req.query;
@@ -124,6 +203,91 @@ app.get('/api/guides/:id', (req, res) => {
   const guide = guides.find(g => g.id === req.params.id);
   if (!guide) return res.status(404).json({ error: 'Guide not found' });
   res.json(guide);
+});
+
+// POST /api/guides
+app.post('/api/guides', adminMiddleware, (req, res) => {
+  const { title, plantName, boxId, content, watering, sunlight, soil, seasonalTips } = req.body;
+  if (!title || !boxId || !content) {
+    return res.status(400).json({ error: 'Missing required fields' });
+  }
+
+  const guides = readData('guides.json');
+  const newGuide = {
+    id: `guide-${Date.now()}`,
+    title,
+    plantName,
+    boxId,
+    content,
+    watering,
+    sunlight,
+    soil,
+    seasonalTips
+  };
+
+  guides.push(newGuide);
+  writeData('guides.json', guides);
+
+  const auditLogs = readData('audit.json');
+  auditLogs.push({ action: 'create_guide', guideId: newGuide.id, timestamp: new Date().toISOString(), user: 'admin' });
+  writeData('audit.json', auditLogs);
+
+  res.status(201).json(newGuide);
+});
+
+// PUT /api/guides/:id
+app.put('/api/guides/:id', adminMiddleware, (req, res) => {
+  const { id } = req.params;
+  const { title, plantName, boxId, content, watering, sunlight, soil, seasonalTips } = req.body;
+
+  const guides = readData('guides.json');
+  const guideIndex = guides.findIndex(g => g.id === id);
+
+  if (guideIndex === -1) {
+    return res.status(404).json({ error: 'Guide not found' });
+  }
+
+  const updatedGuide = {
+    ...guides[guideIndex],
+    title: title || guides[guideIndex].title,
+    plantName: plantName !== undefined ? plantName : guides[guideIndex].plantName,
+    boxId: boxId || guides[guideIndex].boxId,
+    content: content || guides[guideIndex].content,
+    watering: watering !== undefined ? watering : guides[guideIndex].watering,
+    sunlight: sunlight !== undefined ? sunlight : guides[guideIndex].sunlight,
+    soil: soil !== undefined ? soil : guides[guideIndex].soil,
+    seasonalTips: seasonalTips !== undefined ? seasonalTips : guides[guideIndex].seasonalTips
+  };
+
+  guides[guideIndex] = updatedGuide;
+  writeData('guides.json', guides);
+
+  const auditLogs = readData('audit.json');
+  auditLogs.push({ action: 'update_guide', guideId: id, timestamp: new Date().toISOString(), user: 'admin' });
+  writeData('audit.json', auditLogs);
+
+  res.json(updatedGuide);
+});
+
+// DELETE /api/guides/:id
+app.delete('/api/guides/:id', adminMiddleware, (req, res) => {
+  const { id } = req.params;
+  let guides = readData('guides.json');
+  const initialLength = guides.length;
+
+  guides = guides.filter(g => g.id !== id);
+
+  if (guides.length === initialLength) {
+    return res.status(404).json({ error: 'Guide not found' });
+  }
+
+  writeData('guides.json', guides);
+
+  const auditLogs = readData('audit.json');
+  auditLogs.push({ action: 'delete_guide', guideId: id, timestamp: new Date().toISOString(), user: 'admin' });
+  writeData('audit.json', auditLogs);
+
+  res.json({ message: 'Guide deleted successfully' });
 });
 
 // POST /api/subscriptions
