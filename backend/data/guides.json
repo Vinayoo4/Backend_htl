@@ -10,5 +10,33 @@
     "boxId": "summer-box-1",
     "title": "Sunflower Care Guide",
     "content": "Plant in full sun. Water deeply but infrequently."
+  },
+  {
+    "id": "guide-1780418126557",
+    "title": "Winter Guide",
+    "plantName": "Snowdrop",
+    "boxId": "box-1",
+    "content": "Plant in snow"
+  },
+  {
+    "id": "guide-1780418128818",
+    "title": "Autumn Guide",
+    "plantName": "Maple",
+    "boxId": "box-2",
+    "content": "Watch leaves fall"
+  },
+  {
+    "id": "guide-1780418131136",
+    "title": "Another Guide",
+    "plantName": "Something",
+    "boxId": "box-3",
+    "content": "Test"
+  },
+  {
+    "id": "guide-1780418134451",
+    "title": "Yet Another Guide",
+    "plantName": "Else",
+    "boxId": "box-4",
+    "content": "Test"
   }
 ]
